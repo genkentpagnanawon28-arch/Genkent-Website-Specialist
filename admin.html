@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form Submissions - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .refresh-btn {
+            padding: 0.75rem 1.5rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f0f9ff;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid #e0f2fe;
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2563eb;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .submissions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .submissions-table th {
+            background: #f9fafb;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .submissions-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            color: #1f2937;
+        }
+
+        .submissions-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .submissions-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .email-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .email-link:hover {
+            text-decoration: underline;
+        }
+
+        .message-cell {
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+
+        .date-cell {
+            white-space: nowrap;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            color: #2563eb;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #9ca3af;
+        }
+
+        .password-form {
+            max-width: 400px;
+            margin: 5rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .password-form h2 {
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+            text-align: center;
+        }
+
+        .password-form input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .password-form input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .password-form button {
+            width: 100%;
+            padding: 1rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .password-form button:hover {
+            background: #3b82f6;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .submissions-table {
+                font-size: 0.875rem;
+            }
+
+            .submissions-table th,
+            .submissions-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .message-cell {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="passwordForm" class="password-form">
+        <h2>Admin Access</h2>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <input type="password" id="passwordInput" placeholder="Enter password" autofocus>
+        <button onclick="checkPassword()">Access</button>
+    </div>
+
+    <div id="adminContent" style="display: none;">
+        <div class="admin-container">
+            <div class="header">
+                <h1><i class="fas fa-envelope"></i> Contact Form Submissions</h1>
+                <button class="refresh-btn" onclick="loadSubmissions()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="stats" id="stats">
+                <!-- Stats will be loaded here -->
+            </div>
+
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Loading submissions...</p>
+            </div>
+
+            <div id="noData" class="no-data" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <p>No submissions yet</p>
+            </div>
+
+            <table class="submissions-table" id="submissionsTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody id="submissionsBody">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Simple password protection (you can change this password)
+        const ADMIN_PASSWORD = 'kentpogi'; // Change this to your desired password
+
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('passwordForm').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadSubmissions();
+            } else {
+                errorMessage.textContent = 'Incorrect password. Please try again.';
+                errorMessage.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // Allow Enter key to submit password
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Replace this URL with your Google Apps Script web app URL for GET requests
+        // Get this URL from: Apps Script > Deploy > Manage deployments > Web app URL
+            const GET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZQ6TeGZAB8Ds6nuX7wAI4VOp004WDP5rTal20p46kpLSub4lOgvageGfjGa5YXXmW/exec';
+
+        async function loadSubmissions() {
+            const loading = document.getElementById('loading');
+            const noData = document.getElementById('noData');
+            const table = document.getElementById('submissionsTable');
+            const body = document.getElementById('submissionsBody');
+            const stats = document.getElementById('stats');
+
+            loading.style.display = 'block';
+            noData.style.display = 'none';
+            table.style.display = 'none';
+            stats.innerHTML = '';
+
+            // Check if URL is configured
+            if (GET_SCRIPT_URL === 'YOUR_GET_SCRIPT_URL_HERE' || !GET_SCRIPT_URL) {
+                loading.style.display = 'none';
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 3rem;">
+                            <p style="color: #6b7280; margin-bottom: 1rem;">
+                                <strong>⚠️ Setup Required:</strong>
+                            </p>
+                            <p style="color: #6b7280; margin-bottom: 0.5rem;">
+                                1. Deploy your Code.gs as a web app (see SETUP_INSTRUCTIONS.md)
+                            </p>
+                            <p style="color: #6b7280; margin-bottom: 0.5rem;">
+                                2. Copy the deployment URL
+                            </p>
+                            <p style="color: #6b7280;">
+                                3. Update GET_SCRIPT_URL in admin.html (line ~140)
+                            </p>
+                        </td>
+                    </tr>
+                `;
+                table.style.display = 'table';
+                return;
+            }
+
+            try {
+                console.log('Fetching submissions from:', GET_SCRIPT_URL);
+                
+                // Google Apps Script CORS workaround using a proxy approach
+                // Since direct fetch has CORS issues, we'll use a different method
+                
+                // Method 1: Try direct fetch first (might work if deployed correctly)
+                let data;
+                try {
+                    const urlWithCache = GET_SCRIPT_URL + '?t=' + new Date().getTime();
+                    const response = await fetch(urlWithCache, {
+                        method: 'GET',
+                        mode: 'cors', // Try with CORS first
+                        credentials: 'omit'
+                    });
+                    
+                    if (response.ok) {
+                        const responseText = await response.text();
+                        console.log('Successfully fetched data');
+                        data = JSON.parse(responseText);
+                    } else {
+                        throw new Error('Response not OK');
+                    }
+                } catch (fetchError) {
+                    console.warn('Direct fetch failed, trying JSONP method:', fetchError);
+                    
+                    // Method 2: Use JSONP callback (works around CORS)
+                    data = await new Promise((resolve, reject) => {
+                        // Create a unique callback name
+                        const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        
+                        // Create script element
+                        const script = document.createElement('script');
+                        script.src = GET_SCRIPT_URL + '?callback=' + callbackName + '&t=' + new Date().getTime();
+                        
+                        // Set up callback
+                        window[callbackName] = function(response) {
+                            delete window[callbackName];
+                            document.body.removeChild(script);
+                            resolve(response);
+                        };
+                        
+                        // Error handling
+                        script.onerror = function() {
+                            delete window[callbackName];
+                            document.body.removeChild(script);
+                            reject(new Error('JSONP request failed'));
+                        };
+                        
+                        // Timeout after 10 seconds
+                        setTimeout(function() {
+                            if (window[callbackName]) {
+                                delete window[callbackName];
+                                document.body.removeChild(script);
+                                reject(new Error('Request timeout'));
+                            }
+                        }, 10000);
+                        
+                        document.body.appendChild(script);
+                    });
+                }
+                
+                console.log('Parsed data:', data);
+
+                if (data.result !== 'success') {
+                    console.error('Server returned error:', data);
+                    throw new Error(data.message || data.errorDetails || 'Failed to load data');
+                }
+
+                const submissions = data.submissions || [];
+                console.log('Submissions found:', submissions.length);
+                
+                if (submissions.length > 0) {
+                    console.log('First submission:', submissions[0]);
+                }
+                
+                if (submissions.length === 0) {
+                    loading.style.display = 'none';
+                    noData.style.display = 'block';
+                    return;
+                }
+
+                // Update stats
+                stats.innerHTML = `
+                    <div class="stat-card">
+                        <h3>Total Submissions</h3>
+                        <div class="value">${submissions.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Today</h3>
+                        <div class="value">${getTodayCount(submissions)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>This Week</h3>
+                        <div class="value">${getWeekCount(submissions)}</div>
+                    </div>
+                `;
+
+                // Clear existing rows
+                body.innerHTML = '';
+
+                // Add submissions
+                submissions.forEach(submission => {
+                    const row = document.createElement('tr');
+                    const date = submission.date ? new Date(submission.date) : new Date();
+                    row.innerHTML = `
+                        <td class="date-cell">${formatDate(date)}</td>
+                        <td>${escapeHtml(submission.name || 'N/A')}</td>
+                        <td><a href="mailto:${submission.email || ''}" class="email-link">${escapeHtml(submission.email || 'N/A')}</a></td>
+                        <td class="message-cell">${escapeHtml(submission.message || 'N/A')}</td>
+                    `;
+                    body.appendChild(row);
+                });
+
+                loading.style.display = 'none';
+                table.style.display = 'table';
+            } catch (error) {
+                console.error('Error loading submissions:', error);
+                loading.style.display = 'none';
+                
+                let errorMessage = error.message || 'Unknown error occurred';
+                let troubleshootingTips = '';
+                
+                if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+                    troubleshootingTips = `
+                        <p style="font-size: 0.875rem; margin-top: 1rem; color: #6b7280;">
+                            <strong>Possible issues:</strong><br>
+                            • Check if the Google Apps Script URL is correct<br>
+                            • Ensure the web app is deployed with "Anyone" access<br>
+                            • Verify your internet connection<br>
+                            • Check browser console (F12) for more details
+                        </p>
+                    `;
+                } else if (errorMessage.includes('JSON')) {
+                    troubleshootingTips = `
+                        <p style="font-size: 0.875rem; margin-top: 1rem; color: #6b7280;">
+                            <strong>Possible issues:</strong><br>
+                            • The script might not be returning valid JSON<br>
+                            • Check Code.gs for syntax errors<br>
+                            • Verify the spreadsheet exists and is accessible
+                        </p>
+                    `;
+                } else {
+                    troubleshootingTips = `
+                        <p style="font-size: 0.875rem; margin-top: 1rem; color: #6b7280;">
+                            <strong>Troubleshooting:</strong><br>
+                            • Verify GET_SCRIPT_URL is correct in admin.html<br>
+                            • Check that doGet() function exists in Code.gs<br>
+                            • Ensure the spreadsheet is accessible<br>
+                            • Try refreshing the page
+                        </p>
+                    `;
+                }
+                
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 2rem; color: #ef4444;">
+                            <p style="font-size: 1.25rem; margin-bottom: 0.5rem;"><strong>⚠️ Error loading submissions</strong></p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem; background: #fef2f2; padding: 1rem; border-radius: 8px; display: inline-block;">
+                                ${errorMessage}
+                            </p>
+                            ${troubleshootingTips}
+                        </td>
+                    </tr>
+                `;
+                table.style.display = 'table';
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getTodayCount(submissions) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return submissions.filter(s => {
+                const date = new Date(s.date);
+                date.setHours(0, 0, 0, 0);
+                return date.getTime() === today.getTime();
+            }).length;
+        }
+
+        function getWeekCount(submissions) {
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return submissions.filter(s => new Date(s.date) >= weekAgo).length;
+        }
+    </script>
+</body>
+</html>
+
